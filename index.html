@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpenClaw Internals Course</title>
     <meta http-equiv="refresh" content="0; url=openclaw-course.html">
+    <script>
+        // Immediate redirect with fallback
+        window.location.href = 'openclaw-course.html';
+        
+        // If still here after 2 seconds, show manual link
+        setTimeout(function() {
+            document.getElementById('manual-link').style.display = 'block';
+        }, 2000);
+    </script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -51,7 +60,10 @@
         <h1>OpenClaw Internals Course</h1>
         <p>Redirecting to the interactive course...</p>
         <p>If you're not redirected automatically, click below:</p>
-        <a href="openclaw-course.html" class="link">Open Interactive Course</a>
+        <a href="openclaw-course.html" class="link" id="manual-link" style="display: none;">Open Interactive Course</a>
+        <p style="margin-top: 1rem; font-size: 0.9rem; color: #6B6560;">
+            Direct link: <a href="openclaw-course.html" style="color: #D94F30;">https://tianx-dev.github.io/openclaw-course/openclaw-course.html</a>
+        </p>
     </div>
 </body>
 </html>
