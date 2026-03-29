@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw: How Your Personal AI Assistant Works</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* --- BACKGROUNDS --- */
+            --color-bg:             #FAF7F2;
+            --color-bg-warm:        #F5F0E8;
+            --color-bg-code:        #1E1E2E;
+            --color-text:           #2C2A28;
+            --color-text-secondary: #6B6560;
+            --color-text-muted:     #9E9790;
+            --color-border:         #E5DFD6;
+            --color-border-light:   #EEEBE5;
+            --color-surface:        #FFFFFF;
+            --color-surface-warm:   #FDF9F3;
+
+            /* --- ACCENT --- */
+            --color-accent:         #D94F30;
+            --color-accent-hover:   #C4432A;
+            --color-accent-light:   #FDEEE9;
+            --color-accent-muted:   #E8836C;
+
+            /* --- SEMANTIC --- */
+            --color-success:        #2D8B55;
+            --color-success-light:  #E8F5EE;
+            --color-error:          #C93B3B;
+            --color-error-light:    #FDE8E8;
+            --color-info:           #2A7B9B;
+            --color-info-light:     #E4F2F7;
+
+            /* --- ACTOR COLORS --- */
+            --color-actor-1:        #D94F30;
+            --color-actor-2:        #2A7B9B;
+            --color-actor-3:        #7B6DAA;
+            --color-actor-4:        #D4A843;
+            --color-actor-5:        #2D8B55;
+
+            /* --- FONTS --- */
+            --font-display:  'Bricolage Grotesque', Georgia, serif;
+            --font-body:     'DM Sans', -apple-system, sans-serif;
+            --font-mono:     'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+            /* --- TYPE SCALE --- */
+            --text-xs:   0.75rem;
+            --text-sm:   0.875rem;
+            --text-base: 1rem;
+            --text-lg:   1.125rem;
+            --text-xl:   1.25rem;
+            --text-2xl:  1.5rem;
+            --text-3xl:  1.875rem;
+            --text-4xl:  2.25rem;
+            --text-5xl:  3rem;
+            --text-6xl:  3.75rem;
+
+            /* --- LINE HEIGHTS --- */
+            --leading-tight:  1.15;
+            --leading-snug:   1.3;
+            --leading-normal: 1.6;
+            --leading-loose:  1.8;
+
+            /* --- SPACING --- */
+            --space-1:  0.25rem;
+            --space-2:  0.5rem;
+            --space-3:  0.75rem;
+            --space-4:  1rem;
+            --space-5:  1.25rem;
+            --space-6:  1.5rem;
+            --space-8:  2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+
+            /* --- RADIUS --- */
+            --radius-sm:  0.25rem;
+            --radius-md:  0.5rem;
+            --radius-lg:  0.75rem;
+            --radius-xl:  1rem;
+            --radius-2xl: 1.5rem;
+
+            /* --- SHADOWS --- */
+            --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md:  0 4px 6px -1px rgba(0, 0, 0, 0.08);
+            --shadow-lg:  0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            --shadow-xl:  0 20px 25px -5px rgba(0, 0, 0, 0.08);
+
+            /* --- ANIMATIONS --- */
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease;
+            --transition-slow: 350ms ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y proximity;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            line-height: var(--leading-normal);
+            color: var(--color-text);
+            background: var(--color-bg);
+            overflow-x: hidden;
+        }
+
+        /* Module Sections */
+        .module {
+            min-height: 100dvh;
+            min-height: 100vh;
+            scroll-snap-align: start;
+            padding: var(--space-12) var(--space-6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .module:nth-child(even) {
+            background: var(--color-bg);
+        }
+
+        .module:nth-child(odd) {
+            background: var(--color-bg-warm);
+        }
+
+        .module-content {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 1000;
+            padding: var(--space-3) var(--space-6);
+        }
+
+        .nav-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-title {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: var(--color-accent);
+        }
+
+        .nav-progress {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-border);
+            transition: all var(--transition-base);
+        }
+
+        .progress-dot.active {
+            background: var(--color-accent);
+            transform: scale(1.2);
+        }
+
+        /* Typography */
+        .module-number {
+            font-family: var(--font-display);
+            font-size: var(--text-6xl);
+            font-weight: 700;
+            color: var(--color-accent);
+            opacity: 0.2;
+            position: absolute;
+            top: var(--space-12);
+            right: var(--space-12);
+            line-height: 1;
+        }
+
+        .module-title {
+            font-family: var(--font-display);
+            font-size: var(--text-4xl);
+            font-weight: 700;
+            line-height: var(--leading-tight);
+            margin-bottom: var(--space-6);
+            color: var(--color-text);
+        }
+
+        .module-subtitle {
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            line-height: var(--leading-snug);
+            margin-bottom: var(--space-4);
+            color: var(--color-text);
+        }
+
+        .screen-title {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 700;
+            line-height: var(--leading-snug);
+            margin-bottom: var(--space-4);
+            color: var(--color-text);
+        }
+
+        p {
+            margin-bottom: var(--space-4);
+        }
+
+        .lead {
+            font-size: var(--text-lg);
+            line-height: var(--leading-loose);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-8);
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--color-bg-code);
+            color: #CDD6F4;
+            padding: var(--space-6);
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            line-height: 1.7;
+            margin: var(--space-6) 0;
+            overflow-x: hidden;
+        }
+
+        .code-block pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .code-keyword { color: #F38BA8; }
+        .code-function { color: #89B4FA; }
+        .code-string { color: #A6E3A1; }
+        .code-number { color: #FAB387; }
+        .code-comment { color: #6C7086; opacity: 0.7; }
+        .code-property { color: #74C7EC; }
+
+        /* Interactive Elements */
+        .translation-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin: var(--space-8) 0;
+        }
+
+        .translation-code {
+            background: var(--color-bg-code);
+            color: #CDD6F4;
+            padding: var(--space-6);
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            line-height: 1.7;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .translation-code pre,
+        .translation-code code {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-x: hidden;
+        }
+
+        .translation-english {
+            background: var(--color-surface-warm);
+            padding: var(--space-6);
+            font-size: var(--text-sm);
+            line-height: 1.7;
+            border-left: 3px solid var(--color-accent);
+        }
+
+        .translation-label {
+            position: absolute;
+            top: var(--space-2);
+            right: var(--space-3);
+            font-size: var(--text-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.5;
+        }
+
+        .translation-english .translation-label {
+            color: var(--color-text-muted);
+        }
+
+        /* Quiz */
+        .quiz {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
+            margin: var(--space-8) 0;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--color-border);
+        }
+
+        .quiz-question {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 700;
+            margin-bottom: var(--space-6);
+            color: var(--color-text);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+        }
+
+        .quiz-option {
+            padding: var(--space-4);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            background: var(--color-surface);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--color-success);
+            background: var(--color-success-light);
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--color-error);
+            background: var(--color-error-light);
+        }
+
+        .quiz-feedback {
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            margin-top: var(--space-4);
+            display: none;
+        }
+
+        .quiz-feedback.correct {
+            background: var(--color-success-light);
+            border-left: 4px solid var(--color-success);
+            display: block;
+        }
+
+        .quiz-feedback.incorrect {
+            background: var(--color-error-light);
+            border-left: 4px solid var(--color-error);
+            display: block;
+        }
+
+        /* Callout Boxes */
+        .callout {
+            background: var(--color-info-light);
+            border-left: 4px solid var(--color-info);
+            padding: var(--space-6);
+            margin: var(--space-6) 0;
+            border-radius: var(--radius-md);
+        }
+
+        .callout-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            margin-bottom: var(--space-2);
+            color: var(--color-info);
+        }
+
+        /* Visual Elements */
+        .actor-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            margin: 0 var(--space-1);
+        }
+
+        .actor-1 { background: color-mix(in srgb, var(--color-actor-1) 15%, transparent); color: var(--color-actor-1); }
+        .actor-2 { background: color-mix(in srgb, var(--color-actor-2) 15%, transparent); color: var(--color-actor-2); }
+        .actor-3 { background: color-mix(in srgb, var(--color-actor-3) 15%, transparent); color: var(--color-actor-3); }
+        .actor-4 { background: color-mix(in srgb, var(--color-actor-4) 15%, transparent); color: var(--color-actor-4); }
+        .actor-5 { background: color-mix(in srgb, var(--color-actor-5) 15%, transparent); color: var(--color-actor-5); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .module {
+                padding: var(--space-8) var(--space-4);
+            }
+            
+            .module-title {
+                font-size: var(--text-3xl);
+            }
+            
+            .translation-block {
+                grid-template-columns: 1fr;
+            }
+            
+            .translation-english {
+                border-left: none;
+                border-top: 3px solid var(--color-accent);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn var(--transition-slow) forwards;
+        }
+
+        /* Screen within module */
+        .screen {
+            margin-bottom: var(--space-16);
+            opacity: 0;
+        }
+
+        .screen.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <div class="nav-title">OpenClaw Internals</div>
+            <div class="nav-progress">
+                <div class="progress-dot active" data-module="1"></div>
+                <div class="progress-dot" data-module="2"></div>
+                <div class="progress-dot" data-module="3"></div>
+                <div class="progress-dot" data-module="4"></div>
+                <div class="progress-dot" data-module="5"></div>
+                <div class="progress-dot" data-module="6"></div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Module 1: Introduction -->
+        <section id="module-1" class="module">
+            <div class="module-number">01</div>
+            <div class="module-content">
+                <h1 class="module-title">Meet OpenClaw: Your Personal AI Assistant</h1>
+                <p class="lead">You send a message on Telegram or WhatsApp, and OpenClaw responds with helpful answers. But what's happening under the hood? Let's trace the journey of your message.</p>
+                
+                <div class="screen active">
+                    <h2 class="screen-title">The Magic Trick</h2>
+                    <p>Imagine you're texting a friend who happens to be a super-smart AI. You ask: <em>"What's the weather like today?"</em> A few seconds later, you get a detailed forecast.</p>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🎩 The Illusion</div>
+                        <p>It feels like magic, but it's actually a carefully orchestrated dance between several software components. Each has a specific job, and they work together to make the AI assistant feel like it's right there in your chat app.</p>
+                    </div>
+                    
+                    <p>OpenClaw isn't one big program—it's a <strong>system</strong> of specialized parts that communicate with each other. Think of it like a restaurant:</p>
+                    
+                    <div class="translation-block animate-in">
+                        <div class="translation-code">
+                            <span class="translation-label">CODE</span>
+<pre><code><span class="code-keyword">const</span> openclaw = {
+  <span class="code-property">gateway</span>: <span class="code-string">"Host"</span>,
+  <span class="code-property">channels</span>: <span class="code-string">"Waiters"</span>,
+  <span class="code-property">agents</span>: <span class="code-string">"Chefs"</span>,
+  <span class="code-property">tools</span>: <span class="code-string">"Kitchen Tools"</span>
+};</span></code></pre>
+                        </div>
+                        <div class="translation-english">
+                            <span class="translation-label">PLAIN ENGLISH</span>
+                            <div class="translation-lines">
+                                <p class="tl">The <strong>Gateway</strong> is like the restaurant host—it manages who comes in and where they sit.</p>
+                                <p class="tl">The <strong>Channels</strong> are waiters—they take your order (message) and bring back food (response).</p>
+                                <p class="tl">The <strong>Agents</strong> are chefs—they prepare your meal using recipes (AI models).</p>
+                                <p class="tl">The <strong>Tools</strong> are kitchen equipment—knives, ovens, mixers that help chefs work.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>When you understand how these pieces work together, you can better direct AI assistants to build what you want, debug when things go wrong, and make smarter decisions about your own projects.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Your First Interaction</h2>
+                    <p>Let's trace what happens when you ask OpenClaw a simple question:</p>
+                    
+                    <div class="quiz">
+                        <div class="quiz-question">You send "What's 2+2?" on Telegram. Which component receives your message first?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option" data-correct="true">The Telegram Channel Plugin</div>
+                            <div class="quiz-option">The Gateway Server</div>
+                            <div class="quiz-option">The AI Agent</div>
+                            <div class="quiz-option">The Tool System</div>
+                        </div>
+                        <div class="quiz-feedback correct">
+                            <strong>Correct!</strong> The Telegram plugin acts like a waiter—it's the first point of contact, taking your order from the Telegram app.
+                        </div>
+                        <div class="quiz-feedback incorrect">
+                            <strong>Not quite.</strong> Remember: Channels (like Telegram) are the "waiters" that interface directly with messaging apps. They receive messages first, then pass them to the Gateway.
+                        </div>
+                    </div>
+                    
+                    <p>The journey has just begun. Your message now needs to travel through the system...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 2: The Gateway -->
+        <section id="module-2" class="module">
+            <div class="module-number">02</div>
+            <div class="module-content">
+                <h1 class="module-title">The Gateway: Traffic Control Center</h1>
+                <p class="lead">Every message needs a central dispatcher. The Gateway is OpenClaw's control tower—it routes traffic, manages security, and keeps everything running smoothly.</p>
+                
+                <div class="screen active">
+                    <h2 class="screen-title">Air Traffic Control for AI</h2>
+                    <p>Think of the Gateway as an airport control tower. Planes (messages) arrive from different airlines (channels), and the tower directs them to the right runways (agents), checks their credentials (authentication), and makes sure they don't collide.</p>
+                    
+                    <div class="code-block">
+<pre><code><span class="code-comment">// Simplified Gateway responsibilities</span>
+<span class="code-keyword">class</span> <span class="code-function">Gateway</span> {
+  <span class="code-function">authenticate</span>(message) {
+    <span class="code-comment">// Check if this message is allowed</span>
+    <span class="code-keyword">return</span> <span class="code-string">"✅ Valid user"</span>;
+  }
+  
+  <span class="code-function">route</span>(message) {
+    <span class="code-comment">// Send to the right agent session</span>
+    <span class="code-keyword">return</span> <span class="code-string">"📨 Delivered to agent"</span>;
+  }
+  
+  <span class="code-function">manageSession</span>(user) {
+    <span class="code-comment">// Keep track of conversation history</span>
+    <span class="code-keyword">return</span> <span class="code-string">"🗂️ Session maintained"</span>;
+  }
+}</span></code></pre>
+                    </div>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🔐 Security First</div>
+                        <p>The Gateway handles authentication to make sure only authorized users can talk to your AI assistant. It's like the bouncer at a club—checking IDs before letting anyone in.</p>
+                    </div>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Real Code from OpenClaw</h2>
+                    <p>Here's actual Gateway code that shows how it handles incoming messages:</p>
+                    
+                    <div class="translation-block animate-in">
+                        <div class="translation-code">
+                            <span class="translation-label">CODE</span>
+<pre><code><span class="code-comment">// From: src/gateway/server-chat.ts</span>
+<span class="code-keyword">async function</span> <span class="code-function">handleIncomingMessage</span>(message) {
+  <span class="code-comment">// 1. Validate the message structure</span>
+  <span class="code-keyword">const</span> validated = <span class="code-keyword">await</span> <span class="code-function">validateMessage</span>(message);
+  
+  <span class="code-comment">// 2. Find or create a session</span>
+  <span class="code-keyword">const</span> session = <span class="code-keyword">await</span> <span class="code-function">getOrCreateSession</span>(
+    validated.userId,
+    validated.channel
+  );
+  
+  <span class="code-comment">// 3. Route to the agent</span>
+  <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">routeToAgent</span>(
+    session,
+    validated.content
+  );
+  
+  <span class="code-comment">// 4. Send response back through channel</span>
+  <span class="code-keyword">return</span> <span class="code-keyword">await</span> <span class="code-function">sendThroughChannel</span>(
+    validated.channel,
+    response
+  );
+}</span></code></pre>
+                        </div>
+                        <div class="translation-english">
+                            <span class="translation-label">PLAIN ENGLISH</span>
+                            <div class="translation-lines">
+                                <p class="tl">First, check if the message is properly formatted and comes from a real user.</p>
+                                <p class="tl">Find the user's existing conversation or start a new one if this is their first message.</p>
+                                <p class="tl">Pass the message to the AI agent (the "chef") to prepare a response.</p>
+                                <p class="tl">Take the AI's response and send it back through the same channel (Telegram, WhatsApp, etc.).</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>Notice the clear separation of concerns: validation → session management → AI processing → delivery. Each step has one job.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Gateway Quiz</h2>
+                    <p>Test your understanding of the Gateway's role:</p>
+                    
+                    <div class="quiz">
+                        <div class="quiz-question">What's the MAIN purpose of the Gateway in OpenClaw?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">To run the AI models directly</div>
+                            <div class="quiz-option" data-correct="true">To route messages between channels and agents</div>
+                            <div class="quiz-option">To store all conversation history permanently</div>
+                            <div class="quiz-option">To provide the user interface for chatting</div>
+                        </div>
+                        <div class="quiz-feedback correct">
+                            <strong>Exactly!</strong> The Gateway is primarily a router and traffic controller. It doesn't run AI models itself—it passes messages to agents that do.
+                        </div>
+                        <div class="quiz-feedback incorrect">
+                            <strong>Think about the metaphor:</strong> The Gateway is like an airport control tower. It directs traffic but doesn't fly planes (run AI) or build terminals (store data).
+                        </div>
+                    </div>
+                    
+                    <p>Now that the Gateway has routed your message, it's time for the AI agent to work its magic...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 3: AI Agents -->
+        <section id="module-3" class="module">
+            <div class="module-number">03</div>
+            <div class="module-content">
+                <h1 class="module-title">AI Agents: The Brain</h1>
+                <p class="lead">Agents are where the thinking happens. They're like skilled chefs who take your order (message) and prepare a response using AI models as their recipe books.</p>
+                
+                <div class="screen active">
+                    <h2 class="screen-title">The Chef's Kitchen</h2>
+                    <p>An AI agent in OpenClaw isn't just calling one AI model—it's orchestrating a whole kitchen of tools and techniques:</p>
+                    
+                    <div class="code-block">
+<pre><code><span class="code-comment">// Agent's decision process</span>
+<span class="code-keyword">async function</span> <span class="code-function">processMessage</span>(message) {
+  <span class="code-comment">// 1. Understand what the user wants</span>
+  <span class="code-keyword">const</span> intent = <span class="code-keyword">await</span> <span class="code-function">analyzeIntent</span>(message);
+  
+  <span class="code-comment">// 2. Check if tools are needed</span>
+  <span class="code-keyword">if</span> (<span class="code-function">needsTools</span>(intent)) {
+    <span class="code-keyword">const</span> tools = <span class="code-keyword">await</span> <span class="code-function">selectTools</span>(intent);
+    <span class="code-keyword">const</span> results = <span class="code-keyword">await</span> <span class="code-function">executeTools</span>(tools);
+    <span class="code-keyword">return</span> <span class="code-keyword">await</span> <span class="code-function">formatResponse</span>(results);
+  }
+  
+  <span class="code-comment">// 3. Or just generate a direct response</span>
+  <span class="code-keyword">return</span> <span class="code-keyword">await</span> <span class="code-function">generateResponse</span>(message);
+}</span></code></pre>
+                    </div>
+                    
+                    <p>Agents can choose different AI models (like picking the right cookbook) and use tools (like kitchen appliances) to get information or perform actions.</p>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🧠 Model Selection</div>
+                        <p>OpenClaw supports multiple AI providers: OpenAI, Anthropic, Google, open-source models, and more. The agent can switch between them based on availability, cost, or capability—like a chef choosing between a gas stove or induction cooktop.</p>
+                    </div>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Tools: The Agent's Swiss Army Knife</h2>
+                    <p>What makes OpenClaw powerful isn't just the AI—it's the <strong>tools</strong> the AI can use. Tools let the agent:</p>
+                    
+                    <ul style="margin: var(--space-6) 0; padding-left: var(--space-6);">
+                        <li style="margin-bottom: var(--space-2);">📁 <strong>Read files</strong> from your workspace</li>
+                        <li style="margin-bottom: var(--space-2);">💻 <strong>Run commands</strong> on your computer</li>
+                        <li style="margin-bottom: var(--space-2);">🌐 <strong>Search the web</strong> for current information</li>
+                        <li style="margin-bottom: var(--space-2);">📝 <strong>Edit code</strong> in your projects</li>
+                        <li style="margin-bottom: var(--space-2);">🔧 <strong>Execute skills</strong> for specialized tasks</li>
+                    </ul>
+                    
+                    <div class="translation-block animate-in">
+                        <div class="translation-code">
+                            <span class="translation-label">CODE</span>
+<pre><code><span class="code-comment">// Tool definition example</span>
+<span class="code-keyword">const</span> readTool = {
+  <span class="code-property">name</span>: <span class="code-string">"read"</span>,
+  <span class="code-property">description</span>: <span class="code-string">"Read file contents"</span>,
+  <span class="code-property">parameters</span>: {
+    <span class="code-property">path</span>: <span class="code-string">"Path to file"</span>
+  },
+  <span class="code-function">execute</span>(path) {
+    <span class="code-comment">// Actually read the file</span>
+    <span class="code-keyword">return</span> <span class="code-function">readFile</span>(path);
+  }
+};</span></code></pre>
+                        </div>
+                        <div class="translation-english">
+                            <span class="translation-label">PLAIN ENGLISH</span>
+                            <div class="translation-lines">
+                                <p class="tl">Each tool has a <strong>name</strong> so the AI knows what to call it.</p>
+                                <p class="tl">A <strong>description</strong> tells the AI when to use this tool.</p>
+                                <p class="tl"><strong>Parameters</strong> are the information the tool needs (like a file path).</p>
+                                <p class="tl">The <strong>execute</strong> function does the actual work when called.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>When you ask "What's in my notes.txt file?", the agent uses the <span class="actor-badge actor-1">read</span> tool, gets the content, and includes it in its response.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Agent Decision Making</h2>
+                    <p>Let's see how an agent decides what to do:</p>
+                    
+                    <div class="quiz">
+                        <div class="quiz-question">You ask: "Check if server.js has any syntax errors." What will the agent MOST LIKELY do?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">Generate a generic response about JavaScript</div>
+                            <div class="quiz-option" data-correct="true">Use the 'read' tool to examine server.js, then analyze it</div>
+                            <div class="quiz-option">Ask you to send the file contents in the chat</div>
+                            <div class="quiz-option">Ignore the request as too complex</div>
+                        </div>
+                        <div class="quiz-feedback correct">
+                            <strong>Perfect!</strong> The agent will use available tools (like 'read') to get the file content, then use its AI capabilities to analyze the code for errors.
+                        </div>
+                        <div class="quiz-feedback incorrect">
+                            <strong>Remember:</strong> Agents have access to tools. They don't just generate text—they can take actions like reading files, running commands, and more.
+                        </div>
+                    </div>
+                    
+                    <p>With the response prepared, it's time to deliver it back to you...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 4: Channels & Delivery -->
+        <section id="module-4" class="module">
+            <div class="module-number">04</div>
+            <div class="module-content">
+                <h1 class="module-title">Channels: The Delivery System</h1>
+                <p class="lead">Channels are OpenClaw's bridge to the outside world. They're specialized adapters that speak the language of each messaging platform—Telegram, WhatsApp, Discord, and more.</p>
+                
+                <div class="screen active">
+                    <h2 class="screen-title">Universal Translators</h2>
+                    <p>Each messaging app has its own API, format, and quirks. Channels handle these differences so the rest of OpenClaw can work with a consistent interface:</p>
+                    
+                    <div class="code-block">
+<pre><code><span class="code-comment">// Channel abstraction layer</span>
+<span class="code-keyword">interface</span> <span class="code-function">Channel</span> {
+  <span class="code-comment">// Convert platform-specific message to OpenClaw format</span>
+  <span class="code-function">receive</span>(platformMessage): Message;
+  
+  <span class="code-comment">// Convert OpenClaw response to platform format</span>
+  <span class="code-function">send</span>(response): platformResponse;
+  
+  <span class="code-comment">// Handle platform-specific features</span>
+  <span class="code-function">handleReactions</span>(reaction);
+  <span class="code-function">handleThreads</span>(thread);
+  <span class="code-function">handleMedia</span>(media);
+}</span></code></pre>
+                    </div>
+                    
+                    <p>This abstraction is powerful: the Gateway and Agents don't need to know if they're talking to Telegram, WhatsApp, or Discord. They just work with clean, standardized messages.</p>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🌉 Bridge Pattern</div>
+                        <p>This is a classic software design pattern: create an abstraction (Channel interface) that separates platform-specific code from the core logic. It's like having universal power adapters for different countries—the device (OpenClaw core) works the same everywhere.</p>
+                    </div>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Real Channel Implementation</h2>
+                    <p>Here's how a Telegram channel might handle an incoming message:</p>
+                    
+                    <div class="translation-block animate-in">
+                        <div class="translation-code">
+                            <span class="translation-label">CODE</span>
+<pre><code><span class="code-comment">// Simplified Telegram channel</span>
+<span class="code-keyword">class</span> <span class="code-function">TelegramChannel</span> {
+  <span class="code-function">receive</span>(telegramUpdate) {
+    <span class="code-comment">// Extract the meaningful parts</span>
+    <span class="code-keyword">return</span> {
+      <span class="code-property">id</span>: telegramUpdate.message_id,
+      <span class="code-property">text</span>: telegramUpdate.text,
+      <span class="code-property">userId</span>: telegramUpdate.from.id,
+      <span class="code-property">channel</span>: <span class="code-string">"telegram"</span>,
+      <span class="code-property">timestamp</span>: telegramUpdate.date
+    };
+  }
+  
+  <span class="code-function">send</span>(response) {
+    <span class="code-comment">// Format for Telegram API</span>
+    <span class="code-keyword">return</span> {
+      <span class="code-property">chat_id</span>: response.userId,
+      <span class="code-property">text</span>: response.text,
+      <span class="code-property">parse_mode</span>: <span class="code-string">"Markdown"</span>
+    };
+  }
+}</span></code></pre>
+                        </div>
+                        <div class="translation-english">
+                            <span class="translation-label">PLAIN ENGLISH</span>
+                            <div class="translation-lines">
+                                <p class="tl"><strong>Receive:</strong> Take Telegram's complex message object and extract just what OpenClaw needs (ID, text, user, timestamp).</p>
+                                <p class="tl"><strong>Send:</strong> Take OpenClaw's simple response and wrap it in Telegram's expected format with the right chat ID and formatting options.</p>
+                                <p class="tl">The channel acts as a <strong>translator</strong> between two different languages.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>Different channels handle different features: Telegram has inline keyboards, Discord has embeds, WhatsApp has business APIs. Each channel implements these platform-specific features while presenting a clean interface to OpenClaw.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Channel Architecture Quiz</h2>
+                    <p>Why does OpenClaw use this channel abstraction?</p>
+                    
+                    <div class="quiz">
+                        <div class="quiz-question">What's the MAIN benefit of having separate channel implementations?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">It makes the code longer and more complex</div>
+                            <div class="quiz-option">Each developer can work on their favorite platform</div>
+                            <div class="code-function">It isolates platform-specific code so the core doesn't need to change</div>
+                            <div class="quiz-option" data-correct="true">It allows adding new platforms without rewriting the entire system</div>
+                        </div>
+                        <div class="quiz-feedback correct">
+                            <strong>Exactly!</strong> This is the power of abstraction. To add Slack support, you just create a SlackChannel class—no changes needed to Gateway, Agents, or Tools.
+                        </div>
+                        <div class="quiz-feedback incorrect">
+                            <strong>Think about scalability:</strong> The goal is to make it easy to add new messaging platforms. If every part of OpenClaw had to understand Telegram's API directly, adding WhatsApp would require rewriting everything.
+                        </div>
+                    </div>
+                    
+                    <p>Now let's look at how all these pieces work together in a complete flow...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 5: Complete Flow -->
+        <section id="module-5" class="module">
+            <div class="module-number">05</div>
+            <div class="module-content">
+                <h1 class="module-title">The Complete Journey</h1>
+                <p class="lead">Let's trace a message through the entire system, from your keyboard to the AI's response and back to your screen.</p>
+                
+                <div class="screen active">
+                    <h2 class="screen-title">Step-by-Step Walkthrough</h2>
+                    <p>You ask: <em>"What files are in my project directory?"</em> Here's what happens:</p>
+                    
+                    <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-6); margin: var(--space-8) 0; border: 2px solid var(--color-border);">
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--color-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</div>
+                            <div>
+                                <strong>Telegram App</strong> → <span class="actor-badge actor-1">Telegram Channel</span>
+                                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Your message goes from Telegram's servers to OpenClaw's Telegram plugin</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--color-actor-2); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</div>
+                            <div>
+                                <span class="actor-badge actor-1">Telegram Channel</span> → <span class="actor-badge actor-2">Gateway</span>
+                                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Channel extracts the message text, user ID, and converts to OpenClaw format</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--color-actor-3); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</div>
+                            <div>
+                                <span class="actor-badge actor-2">Gateway</span> → <span class="actor-badge actor-3">AI Agent</span>
+                                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Gateway validates user, finds their session, routes message to an agent</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--color-actor-4); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">4</div>
+                            <div>
+                                <span class="actor-badge actor-3">AI Agent</span> → <span class="actor-badge actor-4">Tools</span>
+                                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Agent decides to use 'exec' tool to run 'ls' command in your workspace</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--color-actor-3); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">5</div>
+                            <div>
+                                <span class="actor-badge actor-4">Tools</span> → <span class="actor-badge actor-3">AI Agent</span>
+                                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Tool executes 'ls', returns file list. Agent formats it into a nice response</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--color-actor-2); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">6</div>
+                            <div>
+                                <span class="actor-badge actor-3">AI Agent</span> → <span class="actor-badge actor-2">Gateway</span>
+                                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Agent sends formatted response back through Gateway</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--color-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">7</div>
+                            <div>
+                                <span class="actor-badge actor-2">Gateway</span> → <span class="actor-badge actor-1">Telegram Channel</span> → <strong>Telegram App</strong>
+                                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Gateway routes to Telegram channel, which sends to Telegram API, delivering to your phone</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>All this happens in seconds! Each component does its specialized job, passing the message along like a relay race.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">The Power of Separation</h2>
+                    <p>This architecture isn't just theoretical—it has practical benefits:</p>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🔄 Independent Scaling</div>
+                        <p>If Telegram gets especially busy, you could run more Telegram channel instances without touching the Gateway or Agents. Each component can scale independently based on need.</p>
+                    </div>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🔧 Easy Maintenance</div>
+                        <p>When WhatsApp changes their API, only the WhatsApp channel needs updating. The rest of OpenClaw keeps working unchanged.</p>
+                    </div>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🧩 Extensibility</div>
+                        <p>Want to add Microsoft Teams support? Just write a TeamsChannel class that implements the Channel interface. No need to understand the AI models or tool system.</p>
+                    </div>
+                    
+                    <p>This is the essence of good software architecture: <strong>separation of concerns</strong>. Each part has one job and does it well.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Flow Comprehension</h2>
+                    <p>Test your understanding of the complete flow:</p>
+                    
+                    <div class="quiz">
+                        <div class="quiz-question">Where does message formatting (like adding markdown) happen?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">In the Telegram app itself</div>
+                            <div class="quiz-option">Only in the AI Agent</div>
+                            <div class="quiz-option" data-correct="true">In the Channel, when converting to platform format</div>
+                            <div class="quiz-option">In the Gateway during routing</div>
+                        </div>
+                        <div class="quiz-feedback correct">
+                            <strong>Right!</strong> Each channel knows its platform's formatting rules. Telegram gets Markdown, Discord might get embeds, plain text channels get simple text.
+                        </div>
+                        <div class="quiz-feedback incorrect">
+                            <strong>Remember the translation metaphor:</strong> Channels translate between OpenClaw's internal format and each platform's specific requirements, including formatting.
+                        </div>
+                    </div>
+                    
+                    <p>Now that you understand how OpenClaw works, let's explore why this architecture matters for you...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 6: Why It Matters -->
+        <section id="module-6" class="module">
+            <div class="module-number">06</div>
+            <div class="module-content">
+                <h1 class="module-title">Why This Architecture Matters</h1>
+                <p class="lead">Understanding OpenClaw's design isn't just academic—it helps you use it more effectively, debug issues, and even build your own systems with similar patterns.</p>
+                
+                <div class="screen active">
+                    <h2 class="screen-title">Practical Benefits for Users</h2>
+                    <p>Now that you know how OpenClaw works, you can:</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); margin: var(--space-8) 0;">
+                        <div style="background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="font-size: var(--text-2xl); margin-bottom: var(--space-2);">🔍</div>
+                            <h3 style="font-family: var(--font-display); margin-bottom: var(--space-2);">Debug Effectively</h3>
+                            <p style="font-size: var(--text-sm);">When something goes wrong, you'll know where to look: "Is the channel receiving messages? Is the Gateway running? Is the agent stuck?"</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="font-size: var(--text-2xl); margin-bottom: var(--space-2);">⚙️</div>
+                            <h3 style="font-family: var(--font-display); margin-bottom: var(--space-2);">Configure Smartly</h3>
+                            <p style="font-size: var(--text-sm);">Understanding the separation helps you set up resources: more RAM for AI models, more CPU for tool execution, separate servers for channels.</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="font-size: var(--text-2xl); margin-bottom: var(--space-2);">🚀</div>
+                            <h3 style="font-family: var(--font-display); margin-bottom: var(--space-2);">Extend Confidently</h3>
+                            <p style="font-size: var(--text-sm);">Want to add a new tool? Now you know it goes in the agents/tools system. New platform? That's a channel implementation.</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="font-size: var(--text-2xl); margin-bottom: var(--space-2);">📊</div>
+                            <h3 style="font-family: var(--font-display); margin-bottom: var(--space-2);">Monitor Precisely</h3>
+                            <p style="font-size: var(--text-sm);">You can monitor each component separately: channel latency, Gateway throughput, agent response time, tool execution success rate.</p>
+                        </div>
+                    </div>
+                    
+                    <p>This knowledge turns you from a passive user into an informed operator who can optimize, troubleshoot, and extend the system.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Architecture Patterns You Can Use</h2>
+                    <p>The patterns in OpenClaw aren't unique—they're proven software architecture concepts you can apply elsewhere:</p>
+                    
+                    <div class="translation-block animate-in">
+                        <div class="translation-code">
+                            <span class="translation-label">PATTERN</span>
+<pre><code><span class="code-comment">// 1. Layered Architecture</span>
+User Interface → Business Logic → Data Access
+
+<span class="code-comment">// 2. Plugin System</span>
+Core + Plugins (Channels, Skills, Tools)
+
+<span class="code-comment">// 3. Message Bus / Gateway</span>
+Producers → Router → Consumers
+
+<span class="code-comment">// 4. Tool/Function Calling</span>
+AI Model + Tool Definitions + Execution
+
+<span class="code-comment">// 5. Session Management</span>
+User + Context + History = Session</span></code></pre>
+                        </div>
+                        <div class="translation-english">
+                            <span class="translation-label">APPLICATION</span>
+                            <div class="translation-lines">
+                                <p class="tl"><strong>Layered Architecture:</strong> Keep UI, logic, and data separate for maintainability.</p>
+                                <p class="tl"><strong>Plugin System:</strong> Make core extensible without modifying it.</p>
+                                <p class="tl"><strong>Message Bus:</strong> Decouple components that need to communicate.</p>
+                                <p class="tl"><strong>Tool Calling:</strong> Let AI use external capabilities systematically.</p>
+                                <p class="tl"><strong>Session Management:</strong> Maintain context across interactions.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>These patterns appear in everything from web applications to microservices to desktop software. Recognizing them helps you understand new systems faster.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Final Challenge</h2>
+                    <p>Let's see how well you understand OpenClaw's architecture:</p>
+                    
+                    <div class="quiz">
+                        <div class="quiz-question">You want to add voice message support to OpenClaw. Where should the voice-to-text conversion happen?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">In the Gateway, since it handles all messages</div>
+                            <div class="quiz-option">In a new "VoiceTool" that agents can call</div>
+                            <div class="quiz-option" data-correct="true">In each Channel, since platforms handle media differently</div>
+                            <div class="quiz-option">In the AI Agent, as part of message processing</div>
+                        </div>
+                        <div class="quiz-feedback correct">
+                            <strong>Perfect understanding!</strong> Voice messages are platform-specific media, so each Channel should handle converting them to text before passing to the Gateway. Telegram and WhatsApp might use different APIs for speech-to-text.
+                        </div>
+                        <div class="quiz-feedback incorrect">
+                            <strong>Think about the separation of concerns:</strong> Platform-specific features (like handling voice messages) belong in Channels. The Gateway and Agents should work with standardized text messages.
+                        </div>
+                    </div>
+                    
+                    <div class="callout" style="margin-top: var(--space-8);">
+                        <div class="callout-title">🎓 Congratulations!</div>
+                        <p>You've completed the OpenClaw internals course. You now understand how your personal AI assistant works from the inside out. This knowledge will help you use OpenClaw more effectively, contribute to its development, or build similar systems of your own.</p>
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: var(--space-8);">
+                        <strong>Next Steps:</strong> Check out the OpenClaw source code on GitHub, try building a simple skill, or explore how you might apply these architecture patterns to your own projects.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Module and screen navigation
+        const modules = document.querySelectorAll('.module');
+        const screens = document.querySelectorAll('.screen');
+        const progressDots = document.querySelectorAll('.progress-dot');
+        
+        let currentModule = 1;
+        let currentScreen = 0;
+        
+        // Initialize first screen
+        screens[0].classList.add('active');
+        
+        // Update progress dots
+        function updateProgress() {
+            progressDots.forEach((dot, index) => {
+                if (index + 1 === currentModule) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+        
+        // Scroll to module
+        function scrollToModule(moduleNumber) {
+            const module = document.getElementById(`module-${moduleNumber}`);
+            if (module) {
+                module.scrollIntoView({ behavior: 'smooth' });
+                currentModule = moduleNumber;
+                updateProgress();
+            }
+        }
+        
+        // Quiz functionality
+        document.addEventListener('click', (e) => {
+            // Quiz option selection
+            if (e.target.classList.contains('quiz-option')) {
+                const quiz = e.target.closest('.quiz');
+                const options = quiz.querySelectorAll('.quiz-option');
+                const feedbackCorrect = quiz.querySelector('.quiz-feedback.correct');
+                const feedbackIncorrect = quiz.querySelector('.quiz-feedback.incorrect');
+                
+                // Clear previous selections
+                options.forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'incorrect');
+                });
+                
+                // Mark selected
+                e.target.classList.add('selected');
+                
+                // Check if correct
+                const isCorrect = e.target.dataset.correct === 'true';
+                
+                if (isCorrect) {
+                    e.target.classList.add('correct');
+                    if (feedbackCorrect) feedbackCorrect.style.display = 'block';
+                    if (feedbackIncorrect) feedbackIncorrect.style.display = 'none';
+                } else {
+                    e.target.classList.add('incorrect');
+                    if (feedbackCorrect) feedbackCorrect.style.display = 'none';
+                    if (feedbackIncorrect) feedbackIncorrect.style.display = 'block';
+                    
+                    // Highlight correct answer
+                    const correctOption = quiz.querySelector('.quiz-option[data-correct="true"]');
+                    if (correctOption) correctOption.classList.add('correct');
+                }
+            }
+            
+            // Progress dot clicks
+            if (e.target.classList.contains('progress-dot')) {
+                const moduleNumber = parseInt(e.target.dataset.module);
+                scrollToModule(moduleNumber);
+            }
+        });
+        
+        // Scroll detection for module highlighting
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const scrollPosition = window.scrollY + window.innerHeight / 3;
+                
+                modules.forEach((module, index) => {
+                    const moduleTop = module.offsetTop;
+                    const moduleBottom = moduleTop + module.offsetHeight;
+                    
+                    if (scrollPosition >= moduleTop && scrollPosition < moduleBottom) {
+                        currentModule = index + 1;
+                        updateProgress();
+                    }
+                });
+            }, 100);
+        });
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                if (currentModule < 6) {
+                    scrollToModule(currentModule + 1);
+                }
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (currentModule > 1) {
+                    scrollToModule(currentModule - 1);
+                }
+            }
+        });
+        
+        // Initialize
+        updateProgress();
+        
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate in elements as they come into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.translation-block, .callout, .quiz').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
