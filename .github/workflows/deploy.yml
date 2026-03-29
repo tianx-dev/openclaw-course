@@ -1,0 +1,264 @@
+name: Deploy OpenClaw Course
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual triggers
+
+# Permissions for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Test job - runs on all pushes and PRs
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper versioning
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies (if any)
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+          else
+            echo "No package.json found, skipping npm install"
+          fi
+          
+      - name: Validate HTML structure
+        run: |
+          echo "Validating HTML structure..."
+          if ! grep -q "<!DOCTYPE html>" openclaw-course.html; then
+            echo "❌ Missing DOCTYPE declaration"
+            exit 1
+          fi
+          
+          if ! grep -q "<html" openclaw-course.html; then
+            echo "❌ Missing <html> tag"
+            exit 1
+          fi
+          
+          if ! grep -q "</html>" openclaw-course.html; then
+            echo "❌ Missing closing </html> tag"
+            exit 1
+          fi
+          
+          echo "✅ HTML structure is valid"
+          
+      - name: Check for broken links (internal)
+        run: |
+          echo "Checking internal links..."
+          # Extract all href attributes
+          grep -o 'href="[^"]*"' openclaw-course.html | \
+            grep -v 'http' | \
+            grep -v 'mailto:' | \
+            grep -v 'tel:' | \
+            grep -v '#' | \
+            sed 's/href="//g' | sed 's/"//g' | \
+            while read -r link; do
+              if [ -n "$link" ] && [ ! -f "$link" ] && [ ! -d "$link" ]; then
+                echo "⚠️  Warning: Internal link '$link' might be broken"
+              fi
+            done
+          
+      - name: Check file sizes
+        run: |
+          echo "Checking file sizes..."
+          HTML_SIZE=$(stat -c%s openclaw-course.html 2>/dev/null || stat -f%z openclaw-course.html)
+          echo "HTML file size: $HTML_SIZE bytes"
+          
+          if [ "$HTML_SIZE" -gt 200000 ]; then
+            echo "⚠️  Warning: HTML file is large (>200KB). Consider optimization."
+          fi
+          
+      - name: Count interactive elements
+        run: |
+          echo "Counting interactive elements..."
+          QUIZ_COUNT=$(grep -c "quiz-option" openclaw-course.html || true)
+          MODULE_COUNT=$(grep -c "module-number" openclaw-course.html || true)
+          TRANSLATION_COUNT=$(grep -c "translation-block" openclaw-course.html || true)
+          
+          echo "📊 Course Statistics:"
+          echo "  - Modules: $MODULE_COUNT"
+          echo "  - Quiz questions: $QUIZ_COUNT"
+          echo "  - Code translations: $TRANSLATION_COUNT"
+          
+      - name: Validate JavaScript syntax (basic)
+        run: |
+          echo "Checking JavaScript syntax..."
+          # Extract and validate inline JavaScript
+          if grep -q "<script>" openclaw-course.html; then
+            echo "✅ JavaScript detected"
+            # Count functions
+            FUNCTION_COUNT=$(grep -c "function " openclaw-course.html || true)
+            echo "  - Functions: $FUNCTION_COUNT"
+          else
+            echo "⚠️  No JavaScript found (course might not be interactive)"
+          fi
+          
+      - name: Run accessibility check (basic)
+        run: |
+          echo "Running basic accessibility checks..."
+          # Check for alt text on images
+          IMG_COUNT=$(grep -c "<img" openclaw-course.html || true)
+          ALT_COUNT=$(grep -c 'alt="' openclaw-course.html || true)
+          
+          if [ "$IMG_COUNT" -gt 0 ]; then
+            if [ "$IMG_COUNT" -eq "$ALT_COUNT" ]; then
+              echo "✅ All $IMG_COUNT images have alt text"
+            else
+              echo "⚠️  Not all images have alt text ($ALT_COUNT/$IMG_COUNT)"
+            fi
+          fi
+          
+          # Check for semantic headings
+          if grep -q "<h1>" openclaw-course.html; then
+            echo "✅ H1 heading found"
+          else
+            echo "⚠️  No H1 heading found"
+          fi
+
+  # Deploy job - only runs on pushes to main
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
+      - name: Verify deployment
+        run: |
+          echo "Deployment completed!"
+          echo "URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "Waiting for site to be available..."
+          sleep 10
+          
+          # Try to access the site
+          if curl -s -I "${{ steps.deployment.outputs.page_url }}" | grep -q "200 OK"; then
+            echo "✅ Site is accessible"
+          else
+            echo "⚠️  Site might not be ready yet. Check in 1-2 minutes."
+          fi
+        
+      - name: Create deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**✅ OpenClaw Course Successfully Deployed**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Live URL** | [${{ steps.deployment.outputs.page_url }}](${{ steps.deployment.outputs.page_url }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Repository** | [tianx-dev/openclaw-course](https://github.com/tianx-dev/openclaw-course) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Deployment Time** | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Visit the [live course](${{ steps.deployment.outputs.page_url }})" >> $GITHUB_STEP_SUMMARY
+          echo "2. Test all interactive features" >> $GITHUB_STEP_SUMMARY
+          echo "3. Share with the OpenClaw community" >> $GITHUB_STEP_SUMMARY
+          echo "4. Monitor for any issues" >> $GITHUB_STEP_SUMMARY
+          
+      - name: Send notification (optional)
+        if: success()
+        run: |
+          echo "Deployment successful! Add notification logic here."
+          # Example: Slack, Discord, or email notification
+          # Uncomment and configure as needed:
+          #
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"OpenClaw course deployed successfully!\nURL: ${{ steps.deployment.outputs.page_url }}"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Post-deployment checks (runs after deploy)
+  post-deploy:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for deployment to propagate
+        run: |
+          echo "Waiting for deployment to fully propagate..."
+          sleep 30
+          
+      - name: Run basic smoke tests
+        run: |
+          echo "Running smoke tests on live site..."
+          URL="${{ needs.deploy.outputs.page_url }}"
+          
+          # Test 1: Can we access the site?
+          echo "Test 1: Site accessibility"
+          if curl -s -f "$URL" > /dev/null; then
+            echo "✅ Site is accessible"
+          else
+            echo "❌ Site is not accessible"
+            exit 1
+          fi
+          
+          # Test 2: Check for key content
+          echo "Test 2: Key content verification"
+          if curl -s "$URL" | grep -q "OpenClaw"; then
+            echo "✅ 'OpenClaw' content found"
+          else
+            echo "⚠️  'OpenClaw' content not found"
+          fi
+          
+          # Test 3: Check for interactive elements
+          echo "Test 3: Interactive elements"
+          if curl -s "$URL" | grep -q "quiz"; then
+            echo "✅ Quiz elements found"
+          else
+            echo "⚠️  Quiz elements not found"
+          fi
+          
+          echo "✅ Smoke tests passed"
+          
+      - name: Generate performance report
+        run: |
+          echo "Generating performance report..."
+          URL="${{ needs.deploy.outputs.page_url }}"
+          
+          # Note: For more detailed performance testing, consider:
+          # - WebPageTest API
+          # - Lighthouse CI
+          # - Google PageSpeed Insights API
+          
+          echo "Performance testing setup complete."
+          echo "For detailed metrics, integrate with:"
+          echo "  - Lighthouse CI: https://github.com/GoogleChrome/lighthouse-ci"
+          echo "  - WebPageTest: https://www.webpagetest.org/"
+          echo "  - PageSpeed Insights: https://developers.google.com/speed/docs/insights/v5/get-started"

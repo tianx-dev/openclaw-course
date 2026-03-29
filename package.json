@@ -1,0 +1,81 @@
+{
+  "name": "openclaw-course",
+  "version": "1.0.0",
+  "description": "Interactive course explaining OpenClaw internals",
+  "main": "openclaw-course.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "live-server --port=8000 --watch=openclaw-course.html,styles.css,script.js",
+    "test": "node test/validate.js",
+    "lint": "htmlhint openclaw-course.html",
+    "format": "prettier --write openclaw-course.html",
+    "build": "node scripts/build.js",
+    "deploy": "./update-and-deploy.sh -a",
+    "deploy:check": "./update-and-deploy.sh -c",
+    "deploy:test": "./update-and-deploy.sh -t",
+    "backup": "./update-and-deploy.sh -b",
+    "analyze": "node scripts/analyze.js",
+    "stats": "node scripts/stats.js",
+    "optimize": "node scripts/optimize.js"
+  },
+  "keywords": [
+    "openclaw",
+    "ai",
+    "course",
+    "education",
+    "interactive",
+    "tutorial",
+    "architecture"
+  ],
+  "author": "Tee X <einsdot@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tianx-dev/openclaw-course.git"
+  },
+  "homepage": "https://tianx-dev.github.io/openclaw-course/",
+  "bugs": {
+    "url": "https://github.com/tianx-dev/openclaw-course/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "htmlhint": "^1.1.4",
+    "live-server": "^1.2.2",
+    "prettier": "^3.0.0",
+    "jsdom": "^22.0.0",
+    "cheerio": "^1.0.0-rc.12",
+    "chalk": "^5.2.0",
+    "figlet": "^1.6.0",
+    "inquirer": "^9.2.7",
+    "ora": "^7.0.1"
+  },
+  "optionalDependencies": {
+    "lighthouse": "^10.0.0",
+    "webpack": "^5.88.0",
+    "terser": "^5.19.0",
+    "clean-css": "^5.3.2"
+  },
+  "files": [
+    "openclaw-course.html",
+    "README.md",
+    "LICENSE",
+    "package.json",
+    "update-and-deploy.sh",
+    "deploy.sh",
+    "DEPLOYMENT_GUIDE.md",
+    "GITHUB_DEPLOYMENT.md",
+    "openclaw-analysis.md",
+    "README-course.md",
+    "_config.yml",
+    "index.html",
+    ".github/workflows/deploy.yml"
+  ],
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "maintained node versions"
+  ]
+}
