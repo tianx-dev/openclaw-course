@@ -1086,6 +1086,14 @@ User + Context + History = Session</span></code></pre>
                     <p style="text-align: center; margin-top: var(--space-8);">
                         <strong>Next Steps:</strong> Check out the OpenClaw source code on GitHub, try building a simple skill, or explore how you might apply these architecture patterns to your own projects.
                     </p>
+                    
+                    <div style="text-align: center; margin-top: var(--space-12); padding: var(--space-4); background: var(--color-surface-warm); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                        <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin: 0;">
+                            <strong>Course Published:</strong> March 29, 2026<br>
+                            <strong>Last Updated:</strong> <span id="last-updated">Just now</span><br>
+                            <strong>Version:</strong> 1.0.0
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1203,8 +1211,22 @@ User + Context + History = Session</span></code></pre>
         // Initialize
         updateProgress();
         
-        // Add some interactive animations
+        // Update last updated timestamp
         document.addEventListener('DOMContentLoaded', () => {
+            const lastUpdatedElement = document.getElementById('last-updated');
+            if (lastUpdatedElement) {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZoneName: 'short'
+                };
+                lastUpdatedElement.textContent = now.toLocaleDateString('en-US', options);
+            }
+            
             // Animate in elements as they come into view
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
