@@ -1,6 +1,6 @@
 # 🦞 OpenClaw Internals: Interactive Course
 
-[![Open in Browser](https://img.shields.io/badge/Open%20Course-Browser-blue?style=for-the-badge)](https://txbot168.github.io/openclaw-course/)
+[![Open in Browser](https://img.shields.io/badge/Open%20Course-Browser-blue?style=for-the-badge)](https://tianx-dev.github.io/openclaw-course/)
 [![GitHub Pages](https://img.shields.io/badge/Hosted-GitHub%20Pages-green?style=for-the-badge)](https://pages.github.com/)
 
 An interactive HTML course that explains how **OpenClaw**—your personal AI assistant—works under the hood. No technical background required!
@@ -15,7 +15,7 @@ An interactive HTML course that explains how **OpenClaw**—your personal AI ass
 
 ## 🚀 Quick Start
 
-1. **View Online**: Open the [live course](https://txbot168.github.io/openclaw-course/)
+1. **View Online**: Open the [live course](https://tianx-dev.github.io/openclaw-course/)
 2. **Local View**: Download `openclaw-course.html` and open in any browser
 3. **Explore Code**: Browse the source to learn how the course was built
 
@@ -92,4 +92,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Made with ❤️ by [Tee X](https://github.com/txbot168)** | [Report Issue](https://github.com/txbot168/openclaw-course/issues) | [View Source](https://github.com/txbot168/openclaw-course)
+**Made with ❤️ by [Tee X](https://github.com/tianx-dev)** | [Report Issue](https://github.com/tianx-dev/openclaw-course/issues) | [View Source](https://github.com/tianx-dev/openclaw-course)

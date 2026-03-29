@@ -2,8 +2,8 @@
 title: OpenClaw Internals Course
 description: Interactive course explaining how OpenClaw works under the hood
 baseurl: "/openclaw-course"
-url: "https://txbot168.github.io"
-github_username: txbot168
+url: "https://tianx-dev.github.io"
+github_username: tianx-dev
 
 # Build settings
 markdown: kramdown
