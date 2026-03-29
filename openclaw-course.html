@@ -524,6 +524,38 @@
                 </div>
                 
                 <div class="screen">
+                    <h2 class="screen-title">What Makes OpenClaw Special?</h2>
+                    <p>OpenClaw isn't just another AI chatbot. Here's what sets it apart:</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); margin: var(--space-8) 0;">
+                        <div style="background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="font-size: var(--text-2xl); margin-bottom: var(--space-2);">🏠</div>
+                            <h3 style="font-family: var(--font-display); margin-bottom: var(--space-2);">Runs on Your Hardware</h3>
+                            <p style="font-size: var(--text-sm);">Unlike cloud-only AI assistants, OpenClaw runs on your own devices—your laptop, Raspberry Pi, or home server. You control the data, the costs, and the privacy.</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="font-size: var(--text-2xl); margin-bottom: var(--space-2);">🔌</div>
+                            <h3 style="font-family: var(--font-display); margin-bottom: var(--space-2);">Multi-Platform Bridge</h3>
+                            <p style="font-size: var(--text-sm);">One AI assistant that works across all your messaging apps: Telegram, WhatsApp, Discord, Slack, and more. No need to switch between different bots.</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="font-size: var(--text-2xl); margin-bottom: var(--space-2);">🛠️</div>
+                            <h3 style="font-family: var(--font-display); margin-bottom: var(--space-2);">Tool-Based Intelligence</h3>
+                            <p style="font-size: var(--text-sm);">OpenClaw doesn't just chat—it can read files, run commands, search the web, edit code, and more. It's an AI that can actually <em>do</em> things for you.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🧠 Technical Foundation</div>
+                        <p>OpenClaw is built with modern technologies: <strong>TypeScript/Node.js</strong> for the core, <strong>WebSockets</strong> for real-time communication, a <strong>plugin architecture</strong> for extensibility, and support for multiple <strong>AI providers</strong> (OpenAI, Anthropic, local models, etc.).</p>
+                    </div>
+                    
+                    <p>Now let's trace what happens when you ask OpenClaw a simple question:</p>
+                </div>
+                
+                <div class="screen">
                     <h2 class="screen-title">Your First Interaction</h2>
                     <p>Let's trace what happens when you ask OpenClaw a simple question:</p>
                     
@@ -582,6 +614,50 @@
                     <div class="callout">
                         <div class="callout-title">🔐 Security First</div>
                         <p>The Gateway handles authentication to make sure only authorized users can talk to your AI assistant. It's like the bouncer at a club—checking IDs before letting anyone in.</p>
+                    </div>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Gateway Architecture Deep Dive</h2>
+                    <p>The Gateway is more than just a router—it's a sophisticated system with multiple responsibilities:</p>
+                    
+                    <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-6); margin: var(--space-8) 0; border: 2px solid var(--color-border);">
+                        <div style="display: flex; align-items: start; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="min-width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-weight: bold;">1</div>
+                            <div>
+                                <h4 style="font-family: var(--font-display); margin-bottom: var(--space-1);">WebSocket Management</h4>
+                                <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Maintains persistent connections for real-time communication with channels and agents. Handles connection lifecycle, reconnection logic, and heartbeat monitoring.</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: start; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="min-width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-info-light); color: var(--color-info); display: flex; align-items: center; justify-content: center; font-weight: bold;">2</div>
+                            <div>
+                                <h4 style="font-family: var(--font-display); margin-bottom: var(--space-1);">Session Orchestration</h4>
+                                <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Manages user sessions across multiple channels. Tracks conversation history, context windows, and user preferences. Can handle multiple concurrent sessions per user.</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: start; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+                            <div style="min-width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-success-light); color: var(--color-success); display: flex; align-items: center; justify-content: center; font-weight: bold;">3</div>
+                            <div>
+                                <h4 style="font-family: var(--font-display); margin-bottom: var(--space-1);">Load Balancing & Scaling</h4>
+                                <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Distributes messages across multiple agent instances. Can scale horizontally by adding more gateway instances. Includes health checks and failover mechanisms.</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: start; gap: var(--space-4);">
+                            <div style="min-width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-weight: bold;">4</div>
+                            <div>
+                                <h4 style="font-family: var(--font-display); margin-bottom: var(--space-1);">Plugin & Skill Management</h4>
+                                <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Loads and manages plugins (channels) and skills. Handles dynamic registration, configuration, and lifecycle of extensions. Provides sandboxed execution environments.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="callout">
+                        <div class="callout-title">⚡ Performance Considerations</div>
+                        <p>The Gateway is designed for high throughput: it uses <strong>async/await</strong> for non-blocking I/O, <strong>connection pooling</strong> for database access, <strong>caching</strong> for frequent operations, and can be deployed behind a <strong>load balancer</strong> for horizontal scaling.</p>
                     </div>
                 </div>
                 
@@ -693,6 +769,63 @@
                 </div>
                 
                 <div class="screen">
+                    <h2 class="screen-title">Agent Architecture: More Than Just API Calls</h2>
+                    <p>OpenClaw agents implement sophisticated patterns for reliable AI interactions:</p>
+                    
+                    <div class="code-block">
+<pre><code><span class="code-comment">// Advanced agent patterns in OpenClaw</span>
+<span class="code-keyword">class</span> <span class="code-function">OpenClawAgent</span> {
+  <span class="code-comment">// 1. Context Management</span>
+  <span class="code-function">maintainContext</span>(messages, maxTokens) {
+    <span class="code-comment">// Smart truncation, summarization, priority retention</span>
+    <span class="code-keyword">return</span> <span class="code-function">optimizeContext</span>(messages, maxTokens);
+  }
+  
+  <span class="code-comment">// 2. Tool Execution with Safety</span>
+  <span class="code-function">executeToolSafely</span>(tool, params) {
+    <span class="code-comment">// Sandboxed execution, timeouts, resource limits</span>
+    <span class="code-keyword">return</span> <span class="code-function">sandbox</span>().<span class="code-function">run</span>(tool, params);
+  }
+  
+  <span class="code-comment">// 3. Fallback & Retry Logic</span>
+  <span class="code-function">callModelWithFallback</span>(prompt, primaryModel, fallbackModels) {
+    <span class="code-comment">// Try primary, fall back if fails, exponential backoff</span>
+    <span class="code-keyword">for</span> (<span class="code-keyword">const</span> model <span class="code-keyword">of</span> [primaryModel, ...fallbackModels]) {
+      <span class="code-keyword">try</span> {
+        <span class="code-keyword">return</span> <span class="code-keyword">await</span> <span class="code-function">callModel</span>(model, prompt);
+      } <span class="code-keyword">catch</span> (error) {
+        <span class="code-keyword">if</span> (<span class="code-function">isLastModel</span>(model)) <span class="code-keyword">throw</span> error;
+      }
+    }
+  }
+  
+  <span class="code-comment">// 4. Cost Optimization</span>
+  <span class="code-function">optimizeCost</span>(task, availableModels) {
+    <span class="code-comment">// Choose model based on task complexity and cost</span>
+    <span class="code-keyword">return</span> <span class="code-function">selectCostEffectiveModel</span>(task, availableModels);
+  }
+}</span></code></pre>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4); margin: var(--space-6) 0;">
+                        <div style="background: var(--color-surface-warm); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-accent);">
+                            <strong>Context Window Management</strong>
+                            <p style="font-size: var(--text-sm); margin-top: var(--space-2); color: var(--color-text-secondary);">Agents intelligently manage conversation history, using summarization and priority retention to stay within token limits.</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface-warm); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-info);">
+                            <strong>Tool Chaining & Planning</strong>
+                            <p style="font-size: var(--text-sm); margin-top: var(--space-2); color: var(--color-text-secondary);">Agents can plan multi-step tool executions, handling dependencies and intermediate results.</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface-warm); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-success);">
+                            <strong>Error Recovery</strong>
+                            <p style="font-size: var(--text-sm); margin-top: var(--space-2); color: var(--color-text-secondary);">Automatic retry with different approaches, model fallbacks, and graceful degradation when tools fail.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="screen">
                     <h2 class="screen-title">Tools: The Agent's Swiss Army Knife</h2>
                     <p>What makes OpenClaw powerful isn't just the AI—it's the <strong>tools</strong> the AI can use. Tools let the agent:</p>
                     
@@ -732,6 +865,63 @@
                     </div>
                     
                     <p>When you ask "What's in my notes.txt file?", the agent uses the <span class="actor-badge actor-1">read</span> tool, gets the content, and includes it in its response.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Skills: Pre-Built Capabilities</h2>
+                    <p>Beyond basic tools, OpenClaw has a <strong>Skills system</strong>—pre-packaged functionality for common tasks:</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); margin: var(--space-6) 0;">
+                        <div style="background: var(--color-surface); padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                                <div style="width: 24px; height: 24px; border-radius: var(--radius-md); background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-weight: bold;">📊</div>
+                                <strong style="font-family: var(--font-display);">GitHub Issues</strong>
+                            </div>
+                            <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Fetch issues, create PRs, review code, manage projects. Turns OpenClaw into a development assistant.</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface); padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                                <div style="width: 24px; height: 24px; border-radius: var(--radius-md); background: var(--color-info-light); color: var(--color-info); display: flex; align-items: center; justify-content: center; font-weight: bold;">🌤️</div>
+                                <strong style="font-family: var(--font-display);">Weather</strong>
+                            </div>
+                            <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Get forecasts, check conditions, plan activities. Uses wttr.in or Open-Meteo APIs.</p>
+                        </div>
+                        
+                        <div style="background: var(--color-surface); padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                                <div style="width: 24px; height: 24px; border-radius: var(--radius-md); background: var(--color-success-light); color: var(--color-success); display: flex; align-items: center; justify-content: center; font-weight: bold;">🎬</div>
+                                <strong style="font-family: var(--font-display);">Video Frames</strong>
+                            </div>
+                            <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Extract frames from videos, create clips, analyze content. Uses ffmpeg under the hood.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="code-block">
+<pre><code><span class="code-comment">// Skill structure example</span>
+<span class="code-comment">// File: skills/github/SKILL.md</span>
+<span class="code-keyword">#</span> GitHub Skill
+
+<span class="code-comment">## Description</span>
+Fetch GitHub issues, spawn sub-agents to implement fixes,
+open PRs, monitor reviews.
+
+<span class="code-comment">## Usage</span>
+<span class="code-keyword">/</span>gh-issues [owner/repo] [--label bug] [--limit 5]
+
+<span class="code-comment">## Tools Provided</span>
+- fetchIssues(): Get issues from GitHub API
+- createPR(): Open pull request with fixes
+- reviewComments(): Process review feedback
+- monitorCI(): Watch CI runs</span></code></pre>
+                    </div>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🔧 Extensible by Design</div>
+                        <p>Anyone can create skills! Skills are just directories with a <code>SKILL.md</code> file and optional scripts. They auto-register with OpenClaw and become available to all agents. This is how OpenClaw grows its capabilities over time.</p>
+                    </div>
+                    
+                    <p>Skills combine multiple tools into cohesive workflows, making complex tasks simple. For example, the GitHub skill can: find bugs → write fixes → open PRs → monitor reviews → address feedback—all automatically.</p>
                 </div>
                 
                 <div class="screen">
@@ -791,6 +981,68 @@
                     <div class="callout">
                         <div class="callout-title">🌉 Bridge Pattern</div>
                         <p>This is a classic software design pattern: create an abstraction (Channel interface) that separates platform-specific code from the core logic. It's like having universal power adapters for different countries—the device (OpenClaw core) works the same everywhere.</p>
+                    </div>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">Plugin System Architecture</h2>
+                    <p>Channels are implemented as plugins. Here's how OpenClaw's plugin system works:</p>
+                    
+                    <div class="code-block">
+<pre><code><span class="code-comment">// Simplified plugin loader from OpenClaw</span>
+<span class="code-keyword">class</span> <span class="code-function">PluginLoader</span> {
+  <span class="code-function">loadPlugins</span>(pluginDir) {
+    <span class="code-comment">// Scan directory for plugin definitions</span>
+    <span class="code-keyword">const</span> plugins = <span class="code-function">scanDirectory</span>(pluginDir);
+    
+    <span class="code-keyword">return</span> plugins.<span class="code-function">map</span>(pluginConfig =&gt; {
+      <span class="code-comment">// 1. Validate plugin manifest</span>
+      <span class="code-keyword">const</span> validated = <span class="code-function">validatePlugin</span>(pluginConfig);
+      
+      <span class="code-comment">// 2. Load plugin module</span>
+      <span class="code-keyword">const</span> PluginClass = <span class="code-function">require</span>(validated.entryPoint);
+      
+      <span class="code-comment">// 3. Instantiate with configuration</span>
+      <span class="code-keyword">const</span> instance = <span class="code-keyword">new</span> <span class="code-function">PluginClass</span>(validated.config);
+      
+      <span class="code-comment">// 4. Register with Gateway</span>
+      <span class="code-function">registerPlugin</span>(validated.name, instance);
+      
+      <span class="code-keyword">return</span> instance;
+    });
+  }
+}</span></code></pre>
+                    </div>
+                    
+                    <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-6); margin: var(--space-8) 0; border: 2px solid var(--color-border);">
+                        <h4 style="font-family: var(--font-display); margin-bottom: var(--space-4);">Plugin Lifecycle Management</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4);">
+                            <div>
+                                <strong style="display: block; margin-bottom: var(--space-2); color: var(--color-accent);">📦 Discovery</strong>
+                                <p style="font-size: var(--text-sm);">Plugins auto-discover from <code>channels/</code> and <code>skills/</code> directories. Each needs a manifest file.</p>
+                            </div>
+                            
+                            <div>
+                                <strong style="display: block; margin-bottom: var(--space-2); color: var(--color-info);">⚙️ Configuration</strong>
+                                <p style="font-size: var(--text-sm);">Plugins can have YAML/JSON configs. Users configure via CLI or web UI.</p>
+                            </div>
+                            
+                            <div>
+                                <strong style="display: block; margin-bottom: var(--space-2); color: var(--color-success);">🚀 Initialization</strong>
+                                <p style="font-size: var(--text-sm);">Plugins initialize async, connect to external services, register event handlers.</p>
+                            </div>
+                            
+                            <div>
+                                <strong style="display: block; margin-bottom: var(--space-2); color: var(--color-actor-3);">🔄 Runtime</strong>
+                                <p style="font-size: var(--text-sm);">Handle messages, maintain connections, manage state. Can be hot-reloaded.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🔌 Supported Channel Types</div>
+                        <p>OpenClaw supports: <strong>Telegram</strong> (bot API), <strong>WhatsApp</strong> (via WhatsApp Business API or bridges), <strong>Discord</strong> (bot with slash commands), <strong>Slack</strong> (webhooks & apps), <strong>IRC</strong> (legacy support), <strong>Google Chat</strong>, <strong>Signal</strong> (via bridges), and <strong>custom channels</strong> via WebSocket or HTTP endpoints.</p>
                     </div>
                 </div>
                 
@@ -1056,6 +1308,57 @@ User + Context + History = Session</span></code></pre>
                     </div>
                     
                     <p>These patterns appear in everything from web applications to microservices to desktop software. Recognizing them helps you understand new systems faster.</p>
+                </div>
+                
+                <div class="screen">
+                    <h2 class="screen-title">The OpenClaw Ecosystem</h2>
+                    <p>OpenClaw isn't just software—it's a growing ecosystem:</p>
+                    
+                    <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-6); margin: var(--space-8) 0; border: 2px solid var(--color-border);">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-6);">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                                    <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-weight: bold;">📚</div>
+                                    <h4 style="font-family: var(--font-display); margin: 0;">Documentation</h4>
+                                </div>
+                                <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Comprehensive docs at <strong>docs.openclaw.ai</strong>, API references, tutorials, and this course you're taking!</p>
+                            </div>
+                            
+                            <div>
+                                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                                    <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-info-light); color: var(--color-info); display: flex; align-items: center; justify-content: center; font-weight: bold;">👥</div>
+                                    <h4 style="font-family: var(--font-display); margin: 0;">Community</h4>
+                                </div>
+                                <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Active Discord community, GitHub discussions, contributor guidelines, and regular updates.</p>
+                            </div>
+                            
+                            <div>
+                                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                                    <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-success-light); color: var(--color-success); display: flex; align-items: center; justify-content: center; font-weight: bold;">🛠️</div>
+                                    <h4 style="font-family: var(--font-display); margin: 0;">Extensions</h4>
+                                </div>
+                                <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">Growing library of skills and channels. <strong>clawhub.ai</strong> for discovering community skills.</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--color-border);">
+                            <h4 style="font-family: var(--font-display); margin-bottom: var(--space-2);">Key Resources</h4>
+                            <ul style="margin: 0; padding-left: var(--space-4); font-size: var(--text-sm);">
+                                <li><strong>GitHub</strong>: <code>github.com/openclaw/openclaw</code> - Source code and issues</li>
+                                <li><strong>Discord</strong>: <code>discord.gg/clawd</code> - Real-time community</li>
+                                <li><strong>Documentation</strong>: <code>docs.openclaw.ai</code> - Official guides</li>
+                                <li><strong>Skill Hub</strong>: <code>clawhub.ai</code> - Community extensions</li>
+                                <li><strong>npm</strong>: <code>npm install openclaw</code> - Installation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="callout">
+                        <div class="callout-title">🚀 Getting Involved</div>
+                        <p>OpenClaw is open source! You can: <strong>Report bugs</strong> on GitHub, <strong>create skills</strong> for your needs, <strong>build channels</strong> for new platforms, <strong>improve documentation</strong>, or <strong>help others</strong> in the community. Every contribution makes the ecosystem stronger.</p>
+                    </div>
+                    
+                    <p>Now that you understand the architecture, you're equipped to not just use OpenClaw, but to shape its future.</p>
                 </div>
                 
                 <div class="screen">
